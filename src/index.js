@@ -1,12 +1,42 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React, { Component } from "react";
+import { render } from "react-dom";
+import io from 'socket.io-client';
+import Canvas from './Canvas';
+import CanvasSlave from './CanvasSlave';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+class DrawZone extends Component {
+  constructor(props) {
+    super(props);
+    this.state ={isDrawer: true}
+    this.onChangeRole = this.onChangeRole.bind(this);
+    }
+    newDrawing(data){
+        this.setState((prevState)=>({...prevState, data}));
+    }   
+    draw(){
+        this.socket.emit('mouse', this.state.data);
+    }
+    onChangeRole = () =>{
+      this.setState((prevState)=>({isDrawer: !prevState.isDrawer}))
+    }
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+  render() {
+    const { isDrawer } = this.state;
+    return (
+      <div>
+        {/* <button onClick={this.onChangeRole}>change role</button>
+        <p>You are: {(this.state.isDrawer)? ("Drawer"):("Listener")}</p> */}
+        
+          <div >
+            drawer: 
+            <Canvas/>
+          
+            Copy: 
+            <CanvasSlave/>
+          </div>
+      </div>
+    );
+  }
+}
+
+render(<DrawZone />, document.getElementById('root'));
